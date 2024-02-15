@@ -1,0 +1,55 @@
+version: '3.7'
+
+services:
+  prometheus-cluster-a:
+    container_name: prometheus-cluster-a
+    image: prom/prometheus:v2.47.2
+    volumes:
+      - ./prometheus/prometheus-cluster-a.yml:/etc/prometheus/prometheus-cluster-a.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus-cluster-a.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    restart: always
+
+  sample-metrics-cluster-a:
+    container_name: sm-cluster-a
+    image: victoramsantos/go-prometheus-app:1.2.0
+    environment:
+      - "PORT=8080"
+    ports:
+      - "8080:8080"
+
+  prometheus-cluster-b:
+    container_name: prometheus-cluster-b
+    image: prom/prometheus:v2.47.2
+    volumes:
+      - ./prometheus/prometheus-cluster-b.yml:/etc/prometheus/prometheus-cluster-b.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus-cluster-b.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9091:9090"
+    restart: always
+
+  sample-metrics-cluster-b:
+    container_name: sm-cluster-b
+    image: victoramsantos/go-prometheus-app:1.2.0
+    ports:
+      - "8081:8090"
+
+  promxy:
+    container_name: promxy
+    image: quay.io/jacksontj/promxy:v0.0.84
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./promxy/prometheus-promxy-config-ignore-errors.yml:/etc/promxy/config.yml
+    command:
+      - '--config=/etc/promxy/config.yml'
+      - '--web.enable-lifecycle'
+      - '--log-level="INFO"'
+      - '--log-format=json'
+
+

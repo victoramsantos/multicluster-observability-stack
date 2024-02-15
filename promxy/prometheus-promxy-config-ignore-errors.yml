@@ -1,0 +1,24 @@
+promxy:
+  server_groups:
+    - anti_affinity: 10s
+      http_client:
+        dial_timeout: 600s
+      ignore_error: false
+      labels:
+        cluster_promxy: a
+      scheme: http
+      static_configs:
+        - targets:
+            - host.docker.internal:9090
+      timeout: 600s
+    - anti_affinity: 10s
+      http_client:
+        dial_timeout: 600s
+      ignore_error: false
+      labels:
+        cluster_promxy: b
+      scheme: http
+      static_configs:
+        - targets:
+            - host.docker.internal:9091
+      timeout: 600s
